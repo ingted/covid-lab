@@ -5,8 +5,7 @@ group Client
     Fable.Elmish.React
     Fable.Elmish.Streams
     Fable.Elmish.HMR
-    Elmish.Bridge.Client
-    Thoth.Fetch
+    Fable.Remoting.Client
     Fulma
     Fable.FontAwesome.Free
 

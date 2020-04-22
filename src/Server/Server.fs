@@ -8,8 +8,8 @@ open Giraffe
 open Saturn
 open Shared
 
-open Elmish
-open Elmish.Bridge
+open Fable.Remoting.Server
+open Fable.Remoting.Giraffe
 
 let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
 
@@ -19,38 +19,21 @@ let port =
     "SERVER_PORT"
     |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
-/// Elmish init function with a channel for sending client messages
-/// Returns a new state and commands
-let init clientDispatch () =
-    let value = { Value = 42 }
-    clientDispatch (SyncCounter value)
-    value, Cmd.none
+let counterApi = {
+    initialCounter = fun () -> async { return { Value = 42 } }
+}
 
-/// Elmish update function with a channel for sending client messages
-/// Returns a new state and commands
-let update clientDispatch msg model =
-    match msg with
-    | Increment ->
-        let newModel = { model with Value = model.Value + 1 }
-        clientDispatch (SyncCounter newModel)
-        newModel, Cmd.none
-    | Decrement ->
-        let newModel = { model with Value = model.Value - 1 }
-        clientDispatch (SyncCounter newModel)
-        newModel, Cmd.none
-
-/// Connect the Elmish functions to an endpoint for websocket connections
 let webApp =
-    Bridge.mkServer "/socket/init" init update
-    |> Bridge.run Giraffe.server
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Route.builder
+    |> Remoting.fromValue counterApi
+    |> Remoting.buildHttpHandler
 
 let app = application {
     url ("http://0.0.0.0:" + port.ToString() + "/")
     use_router webApp
     memory_cache
     use_static publicPath
-    use_json_serializer(Thoth.Json.Giraffe.ThothSerializer())
-    app_config Giraffe.useWebSockets
     use_gzip
 }
 

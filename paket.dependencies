@@ -5,12 +5,12 @@ group Server
 
     nuget FSharp.Core
     nuget Saturn
-    nuget Elmish.Bridge.Giraffe ~> 3
-    nuget Thoth.Json.Giraffe
+    nuget Microsoft.AspNetCore.Authentication.JwtBearer // pin for netcoreapp30
+    nuget Fable.Remoting.Giraffe ~> 3
 
 group Client
     source https://api.nuget.org/v3/index.json
-    framework: netstandard2.1
+    framework: netstandard2.0
     storage: none
 
     nuget Fable.Core ~> 3
@@ -20,9 +20,8 @@ group Client
     nuget Fable.Elmish.React ~> 3
     nuget Fable.Elmish.Streams ~> 3
     nuget FSharp.Control.AsyncRx ~> 1.0.0
-    nuget Thoth.Fetch ~> 1
     nuget Fable.React ~> 5
-    nuget Elmish.Bridge.Client ~> 3
+    nuget Fable.Remoting.Client ~> 5
     nuget Fulma ~> 2
     nuget Fable.FontAwesome.Free ~> 2
 

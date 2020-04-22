@@ -2,13 +2,10 @@ module Client
 
 open Elmish
 open Elmish.React
-open Elmish.Bridge
 open Elmish.Streams
 open FSharp.Control
 open Fable.React
 open Fable.React.Props
-open Fetch.Types
-open Thoth.Fetch
 open Fulma
 open Thoth.Json
 
@@ -25,34 +22,45 @@ type Model = { Counter: Counter option }
 type Msg =
     | Increment
     | Decrement
-    | Remote of ClientMsg
+    | InitialCountLoaded of Counter
 
+module Server =
 
-// defines the initial state and initial command (= side-effect) of the application
-let init () : Model * Cmd<Msg> =
-    { Counter = None }, Cmd.none
+    open Shared
+    open Fable.Remoting.Client
 
+    /// A proxy you can use to talk to server directly
+    let api : ICounterApi =
+      Remoting.createApi()
+      |> Remoting.withRouteBuilder Route.builder
+      |> Remoting.buildProxy<ICounterApi>
+let initialCounter = Server.api.initialCounter
+
+// defines the initial state
+let init () : Model =
+    { Counter = None }
 // The update function computes the next state of the application based on the current state and the incoming events/messages
-// It can also run side-effects (encoded as commands) like calling the server via Http.
-// these commands in turn, can dispatch messages to which the update function will react.
-let update (msg : Msg) (currentModel : Model) : Model * Cmd<Msg> =
+let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Counter, msg with
     | Some counter, Increment ->
-        let nextCounter = { counter with Value = counter.Value + 1 }
-        currentModel, Cmd.bridgeSendOr ServerMsg.Increment (Remote(SyncCounter nextCounter))
+        { currentModel with Counter = Some { Value = counter.Value + 1 } }
     | Some counter, Decrement ->
-        let nextCounter = { counter with Value = counter.Value - 1 }
-        currentModel, Cmd.bridgeSendOr ServerMsg.Decrement (Remote(SyncCounter nextCounter))
-    | _, Remote(SyncCounter counter) ->
-        { currentModel with Counter = Some counter}, Cmd.none
-    | _ -> currentModel, Cmd.none
+        { currentModel with Counter = Some { Value = counter.Value - 1 } }
+    | _, InitialCountLoaded initialCount ->
+        { Counter = Some initialCount }
+    | _ -> currentModel
 
+
+let load = AsyncRx.ofAsync (initialCounter ())
+
+let loadCount =
+    load
+    |> AsyncRx.map InitialCountLoaded
+    |> AsyncRx.toStream "loading"
 
 let stream model msgs =
     match model.Counter with
-    | None ->
-        AsyncRx.empty()
-        |> AsyncRx.toStream "loading"
+    | None -> loadCount
     | _ -> msgs
 
 let safeComponents =
@@ -72,7 +80,7 @@ let safeComponents =
              str ", "
              a [ Href "http://elmish-streams.rtfd.io/" ] [ str "Elmish.Streams" ]
              str ", "
-             a [ Href "https://github.com/Nhowka/Elmish.Bridge" ] [ str "Elmish.Bridge" ]
+             a [ Href "https://zaid-ajaj.github.io/Fable.Remoting/" ] [ str "Fable.Remoting" ]
 
            ]
 
@@ -116,13 +124,8 @@ open Elmish.Debug
 open Elmish.HMR
 #endif
 
-Program.mkProgram init update view
+Program.mkSimple init update view
 |> Program.withStream stream "msgs"
-|> Program.withBridgeConfig
-    (
-        Bridge.endpoint "/socket/init"
-        |> Bridge.withMapping Remote
-    )
 #if DEBUG
 |> Program.withConsoleTrace
 #endif
