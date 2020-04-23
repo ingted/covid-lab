@@ -5,8 +5,6 @@ type Country = string
 type Province = string
 
 type CovidCaseDay = {
-    CountryRegion: string
-    ProvinceState: string
     Date: DateTime
     Confirmed: int
     Gain: int

@@ -1,6 +1,19 @@
 namespace Shared
+open System
 
 type Counter = { Value : int }
+
+
+type Country = string
+type Province = string
+
+type CovidCaseDay = {
+    Date: DateTime
+    Confirmed: int
+    Gain: int
+}
+
+type CountryCases = { Country: Country; Province: Province; Cases: CovidCaseDay seq }
 
 module Route =
     /// Defines how routes are generated on server and mapped from client
