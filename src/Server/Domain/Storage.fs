@@ -1,4 +1,5 @@
 namespace Domain
 open Domain.Types
 
-type GetCovidCases = unit -> Async<CountryCases seq>
+type CovidCases = CountryCases seq option
+type GetCovidCases = unit -> Async<CovidCases>

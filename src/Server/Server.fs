@@ -10,6 +10,7 @@ open Shared
 open Application
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
+open Infrastructure
 
 let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
 
@@ -20,7 +21,7 @@ let port =
     |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
 let covidApi = {
-    init = UseCase.getCovidData
+    init = UseCase.getCovidData(Storage.getCovidCases)
 }
 
 let webApp =

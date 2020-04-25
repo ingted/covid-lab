@@ -20,7 +20,7 @@ type Model = { Countries: CountryCases seq option }
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | InitialCountriesLoaded of CountryCases seq
+    | InitialCountriesLoaded of CountryCases seq option
 
 module Server =
 
@@ -41,7 +41,7 @@ let init () : Model =
 let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Countries, msg with
     | _, InitialCountriesLoaded countries ->
-        { Countries = Some countries }
+        { Countries = countries }
     | _ -> currentModel
 
 
