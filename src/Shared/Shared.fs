@@ -1,9 +1,6 @@
 namespace Shared
 open System
 
-type Counter = { Value : int }
-
-
 type Country = string
 type Province = string
 
@@ -22,6 +19,6 @@ module Route =
 
 /// A type that specifies the communication protocol between client and server
 /// to learn more, read the docs at https://zaid-ajaj.github.io/Fable.Remoting/src/basics.html
-type ICounterApi =
-    { initialCounter : unit -> Async<Counter> }
+type ICovidDataApi =
+    { init : unit -> Async<CountryCases seq> }
 

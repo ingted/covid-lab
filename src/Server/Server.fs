@@ -7,7 +7,7 @@ open FSharp.Control.Tasks.V2
 open Giraffe
 open Saturn
 open Shared
-
+open Application
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 
@@ -19,14 +19,14 @@ let port =
     "SERVER_PORT"
     |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
-let counterApi = {
-    initialCounter = fun () -> async { return { Value = 42 } }
+let covidApi = {
+    init = UseCase.getCovidData
 }
 
 let webApp =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Route.builder
-    |> Remoting.fromValue counterApi
+    |> Remoting.fromValue covidApi
     |> Remoting.buildHttpHandler
 
 let app = application {

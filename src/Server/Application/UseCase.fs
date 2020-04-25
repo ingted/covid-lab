@@ -2,9 +2,9 @@ namespace Application
 
 
 module UseCase =
-    open Domain.Types
+    open Shared
 
     let getCovidData () =
         async {
-            return { Country = "Poland"; Province = "Lodzkie"; Cases = Seq.empty }
+            return seq[{ Country = "Poland"; Province = "Lodzkie"; Cases = Seq.empty }]
         }

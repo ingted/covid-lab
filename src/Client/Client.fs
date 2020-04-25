@@ -15,14 +15,12 @@ open Shared
 // in this case, we are keeping track of a counter
 // we mark it as optional, because initially it will not be available from the client
 // the initial value will be requested from server
-type Model = { Counter: Counter option }
+type Model = { Countries: CountryCases seq option }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | Increment
-    | Decrement
-    | InitialCountLoaded of Counter
+    | InitialCountriesLoaded of CountryCases seq
 
 module Server =
 
@@ -30,24 +28,20 @@ module Server =
     open Fable.Remoting.Client
 
     /// A proxy you can use to talk to server directly
-    let api : ICounterApi =
+    let api : ICovidDataApi =
       Remoting.createApi()
       |> Remoting.withRouteBuilder Route.builder
-      |> Remoting.buildProxy<ICounterApi>
-let initialCounter = Server.api.initialCounter
+      |> Remoting.buildProxy<ICovidDataApi>
+let initialCounter = Server.api.init
 
 // defines the initial state
 let init () : Model =
-    { Counter = None }
+    { Countries = None }
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 let update (msg : Msg) (currentModel : Model) : Model =
-    match currentModel.Counter, msg with
-    | Some counter, Increment ->
-        { currentModel with Counter = Some { Value = counter.Value + 1 } }
-    | Some counter, Decrement ->
-        { currentModel with Counter = Some { Value = counter.Value - 1 } }
-    | _, InitialCountLoaded initialCount ->
-        { Counter = Some initialCount }
+    match currentModel.Countries, msg with
+    | _, InitialCountriesLoaded countries ->
+        { Countries = Some countries }
     | _ -> currentModel
 
 
@@ -55,11 +49,11 @@ let load = AsyncRx.ofAsync (initialCounter ())
 
 let loadCount =
     load
-    |> AsyncRx.map InitialCountLoaded
+    |> AsyncRx.map InitialCountriesLoaded
     |> AsyncRx.toStream "loading"
 
 let stream model msgs =
-    match model.Counter with
+    match model.Countries with
     | None -> loadCount
     | _ -> msgs
 
@@ -91,8 +85,8 @@ let safeComponents =
           components ]
 
 let show = function
-    | { Counter = Some counter } -> string counter.Value
-    | { Counter = None   } -> "Loading..."
+    | { Countries = Some countries } -> string (countries |> Seq.head).Country
+    | { Countries = None   } -> "Loading..."
 
 let button txt onClick =
     Button.button
@@ -110,10 +104,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
 
           Container.container []
               [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]
-                Columns.columns []
-                    [ Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
-                      Column.column [] [ button "+" (fun _ -> dispatch Increment) ] ] ]
+                    [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]]
 
           Footer.footer [ ]
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
