@@ -84,11 +84,18 @@ let safeComponents =
           str " powered by: "
           components ]
 
+let tableRow (model: CountryCases) =
+    tr [ ]
+       [ th [ ] [ str model.CountryName ]
+         th [ ] [ str "Nothing" ]
+         th [ ] [ str "Nothing" ] ]
+
 let show = function
     | { Countries = Some countries } ->
-        [ tr[] []]
+        countries |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
     | { Countries = None   } ->
-        [ tr [] []]
+        [ tr [][]]
+
 let button txt onClick =
     Button.button
         [ Button.IsFullWidth
