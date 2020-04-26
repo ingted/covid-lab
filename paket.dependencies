@@ -7,6 +7,7 @@ group Server
     nuget Saturn
     nuget Microsoft.AspNetCore.Authentication.JwtBearer // pin for netcoreapp30
     nuget Fable.Remoting.Giraffe ~> 3
+    nuget FSharp.Control.AsyncSeq
 
 group Client
     source https://api.nuget.org/v3/index.json
