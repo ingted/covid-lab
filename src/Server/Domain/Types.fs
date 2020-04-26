@@ -1,8 +1,7 @@
 namespace Domain.Types
 open System
 
-type Country = string
-type Province = string
+type CountryName = string
 
 type CovidCaseDay = {
     Date: DateTime
@@ -10,5 +9,15 @@ type CovidCaseDay = {
     Gain: int
 }
 
-type CountryCases = { Country: Country; Province: Province; Cases: CovidCaseDay seq }
+type CovidCasesPerDay = CovidCaseDay seq
+
+type Location = { Longitude: double; Latitude: double }
+
+type Province = { Name: string; Location: Location; Cases: CovidCasesPerDay }
+
+type Provinces = Province seq
+
+type ProvicesDataOrNone = Provinces option
+
+type CountryCases = { CountryName: CountryName; Location: Location; WholeCountryCases: CovidCasesPerDay;  Provinces: ProvicesDataOrNone; }
 

@@ -85,9 +85,10 @@ let safeComponents =
           components ]
 
 let show = function
-    | { Countries = Some countries } -> string (countries |> Seq.head).Country
-    | { Countries = None   } -> "Loading..."
-
+    | { Countries = Some countries } ->
+        [ tr[] []]
+    | { Countries = None   } ->
+        [ tr [] []]
 let button txt onClick =
     Button.button
         [ Button.IsFullWidth
@@ -102,10 +103,16 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 [ Heading.h2 [ ]
                     [ str "SAFE Template" ] ] ]
 
-          Container.container []
-              [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]]
 
+          Table.table [ Table.IsBordered
+                        Table.IsFullWidth
+                        Table.IsStriped ]
+              [ thead [ ]
+                  [ tr [ ]
+                       [ th [ ] [ str "Country" ]
+                         th [ ] [ str "Cases" ]
+                         th [ ] [ str "Birthday" ] ] ]
+                tbody [ ] (show model) ]
           Footer.footer [ ]
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
                     [ safeComponents ] ] ]
