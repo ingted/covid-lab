@@ -8,6 +8,7 @@ group Server
     nuget Microsoft.AspNetCore.Authentication.JwtBearer // pin for netcoreapp30
     nuget Fable.Remoting.Giraffe ~> 3
     nuget FSharp.Control.AsyncSeq
+    nuget FSharp.Data
 
 group Client
     source https://api.nuget.org/v3/index.json

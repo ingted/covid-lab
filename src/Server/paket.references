@@ -3,3 +3,4 @@ group Server
     Saturn
     Fable.Remoting.Giraffe
     FSharp.Control.AsyncSeq
+    FSharp.Data

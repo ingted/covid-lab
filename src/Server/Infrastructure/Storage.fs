@@ -5,6 +5,7 @@ open Domain
 open Domain.Types
 
 module Storage =
+
     let getCovidCases(): Async<CovidCases> =
         async {
             return Some
