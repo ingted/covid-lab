@@ -7,7 +7,8 @@ type CountryName = string
 type CovidCaseDay = {
     Date: DateTime
     Confirmed: int
-    Gain: int
+    Recovered: int
+    Deaths: int
 }
 
 type CovidCasesPerDay = CovidCaseDay seq

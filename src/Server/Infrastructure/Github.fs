@@ -73,5 +73,6 @@ module Github =
                   seq
                       [ { Date = DateTime.Now
                           Confirmed = 10
-                          Gain = -1 } ]
+                          Recovered = -1
+                          Deaths = 2 } ]
               Provinces = None })

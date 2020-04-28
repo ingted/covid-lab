@@ -7,7 +7,8 @@ module UseCase =
     let private mapCase (domainCase: Domain.Types.CovidCaseDay): Shared.CovidCaseDay =
         { Date = domainCase.Date
           Confirmed = domainCase.Confirmed
-          Gain = domainCase.Gain }
+          Deaths = domainCase.Deaths
+          Recovered = domainCase.Recovered }
 
     let mapLocation (domainLocation: Domain.Types.Location): Shared.Location =
         { Latitude = domainLocation.Latitude
