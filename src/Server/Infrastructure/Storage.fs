@@ -7,8 +7,8 @@ open FSharp.Control
 
 module Storage =
 
-    let getCovidCases(): Async<CovidCases> =
+    let getCovidCases(): Async<AllCases> =
         async {
             let! data = Github.loadData() |> AsyncSeq.toArrayAsync
-            return Some(data |> Array.toSeq)
+            return data |> Array.toSeq
         }

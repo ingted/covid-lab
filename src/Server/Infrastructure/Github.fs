@@ -11,8 +11,9 @@ module Github =
         { CountryRegion: string
           ProvinceState: string
           LastUpdate: DateTime
-          Confirmed: int
-          Gain: int }
+          Confirmed: int option
+          Deaths: int option
+          Recovered: int option }
 
     let private firstReportDate = DateTime(2020, 1, 22).AddDays(0.)
     let private lastReportDate = DateTime.Today
@@ -33,8 +34,8 @@ module Github =
 
     let private parseConfirmed =
         function
-        | "" -> 0
-        | str -> int str
+        | "" -> None
+        | str -> Some(int str)
 
     let private parseRecord (row: CsvRow) =
         try
@@ -43,7 +44,8 @@ module Github =
                    ProvinceState = row.["Province/State"]
                    LastUpdate = row.["Last Update"].AsDateTime() |> noTime
                    Confirmed = row.["Confirmed"] |> parseConfirmed
-                   Gain = 0 })
+                   Recovered = row.["Recovered"] |> parseConfirmed
+                   Deaths = row.["Deaths"] |> parseConfirmed  })
         with ex -> None
 
 
@@ -55,7 +57,8 @@ module Github =
             with ex -> return None
         }
 
-    let loadData() =
+
+    let loadData() : AsyncSeq<CountryCovidCasesDay> =
         dailyReportUrls
         |> AsyncSeq.ofSeq
         |> AsyncSeq.mapAsync (loadCsv)
@@ -63,16 +66,9 @@ module Github =
         |> AsyncSeq.collect (fun x -> x.Rows |> AsyncSeq.ofSeq)
         |> AsyncSeq.map (parseRecord)
         |> AsyncSeq.choose id
-        |> AsyncSeq.groupBy (fun x -> x.CountryRegion)
-        |> AsyncSeq.map (fun (country, data) ->
-            { CountryName = country
-              Location =
-                  { Longitude = 21.017532
-                    Latitude = 52.237049 }
-              WholeCountryCases =
-                  seq
-                      [ { Date = DateTime.Now
-                          Confirmed = 10
-                          Recovered = -1
-                          Deaths = 2 } ]
-              Provinces = None })
+        |> AsyncSeq.map(fun x-> { Country = x.CountryRegion
+                                  Province = x.ProvinceState |> Option.ofObj
+                                  Date = x.LastUpdate
+                                  Confirmed = x.Confirmed
+                                  Deaths = x.Deaths
+                                  Recovered = x.Recovered })
