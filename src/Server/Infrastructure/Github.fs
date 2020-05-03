@@ -46,7 +46,14 @@ module Github =
                    Confirmed = row.["Confirmed"] |> parseConfirmed
                    Recovered = row.["Recovered"] |> parseConfirmed
                    Deaths = row.["Deaths"] |> parseConfirmed  })
-        with ex -> None
+        with ex ->
+            Some
+                ({ CountryRegion = row.["Country_Region"]
+                   ProvinceState = row.["Province_State"]
+                   LastUpdate = row.["Last Update"].AsDateTime() |> noTime
+                   Confirmed = row.["Confirmed"] |> parseConfirmed
+                   Recovered = row.["Recovered"] |> parseConfirmed
+                   Deaths = row.["Deaths"] |> parseConfirmed  })
 
 
     let private loadCsv url =
@@ -59,7 +66,6 @@ module Github =
 
 
     let loadData() : AsyncSeq<CountryCovidCasesDay> =
-        printfn "lastReportDate %A" lastReportDate
         dailyReportUrls
         |> AsyncSeq.ofSeq
         |> AsyncSeq.mapAsyncParallel (loadCsv)
