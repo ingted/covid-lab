@@ -18,5 +18,6 @@ type CountryCovidCasesDay =
 /// A type that specifies the communication protocol between client and server
 /// to learn more, read the docs at https://zaid-ajaj.github.io/Fable.Remoting/src/basics.html
 type ICovidDataApi =
-    { init : unit -> Async<CountryCovidCasesDay seq> }
+    { init : unit -> Async<CountryCovidCasesDay seq>
+      getByCountry : string -> Async<CountryCovidCasesDay seq> }
 

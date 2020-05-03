@@ -22,6 +22,7 @@ let port =
 
 let covidApi = {
     init = UseCase.getCovidData(Storage.getCovidCases)
+    getByCountry = UseCase.getCovidDataByCountry(Storage.findByCountry)
 }
 
 let webApp =

@@ -15,12 +15,12 @@ open Shared
 // in this case, we are keeping track of a counter
 // we mark it as optional, because initially it will not be available from the client
 // the initial value will be requested from server
-type Model = { Countries: CountryCases seq option }
+type Model = { Countries: CountryCovidCasesDay seq option }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | InitialCountriesLoaded of CountryCases seq option
+    | InitialCountriesLoaded of CountryCovidCasesDay seq
 
 module Server =
 
@@ -41,7 +41,7 @@ let init () : Model =
 let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Countries, msg with
     | _, InitialCountriesLoaded countries ->
-        { Countries = countries }
+        { Countries = Some(countries) }
     | _ -> currentModel
 
 
@@ -84,15 +84,15 @@ let safeComponents =
           str " powered by: "
           components ]
 
-let tableRow (model: CountryCases) =
+let tableRow (model: CountryCovidCasesDay) =
     tr [ ]
-       [ th [ ] [ str model.CountryName ]
-         th [ ] [ str "Nothing" ]
-         th [ ] [ str "Nothing" ] ]
+       [ th [ ] [ str model.Country ]
+         th [ ] [ str ((model.Confirmed |> Option.defaultValue 0).ToString()) ]
+         th [ ] [ str (model.Date.Date.ToString()) ] ]
 
 let show = function
     | { Countries = Some countries } ->
-        countries |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
+        countries |> Seq.sortBy(fun x -> x.Date) |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
     | { Countries = None   } ->
         [ tr [][]]
 

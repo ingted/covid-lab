@@ -17,3 +17,9 @@ module UseCase =
         async {
             let! cases = getCovidCases()
             return cases |> Seq.map (mapToDto) }
+
+    let getCovidDataByCountry (getCovidCases: GetCovidCasesByCountry) (country: string) =
+        async {
+            let! cases = getCovidCases(country)
+            return cases |> Seq.map (mapToDto) }
+

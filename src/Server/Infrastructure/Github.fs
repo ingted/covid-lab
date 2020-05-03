@@ -61,7 +61,7 @@ module Github =
     let loadData() : AsyncSeq<CountryCovidCasesDay> =
         dailyReportUrls
         |> AsyncSeq.ofSeq
-        |> AsyncSeq.mapAsync (loadCsv)
+        |> AsyncSeq.mapAsyncParallel (loadCsv)
         |> AsyncSeq.choose id
         |> AsyncSeq.collect (fun x -> x.Rows |> AsyncSeq.ofSeq)
         |> AsyncSeq.map (parseRecord)
