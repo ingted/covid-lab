@@ -50,7 +50,7 @@ module Github =
             Some
                 ({ CountryRegion = row.["Country_Region"]
                    ProvinceState = row.["Province_State"]
-                   LastUpdate = row.["Last Update"].AsDateTime() |> noTime
+                   LastUpdate = row.["Last_Update"].AsDateTime() |> noTime
                    Confirmed = row.["Confirmed"] |> parseConfirmed
                    Recovered = row.["Recovered"] |> parseConfirmed
                    Deaths = row.["Deaths"] |> parseConfirmed  })
