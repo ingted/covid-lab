@@ -21,7 +21,7 @@ let port =
     |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
 let covidApi = {
-    init = UseCase.getCovidData(Storage.getCovidCases)
+    summary = UseCase.getCovidDataSummary(Storage.summary)
     getByCountry = UseCase.getCovidDataByCountry(Storage.findByCountry)
 }
 

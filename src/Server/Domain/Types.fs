@@ -9,6 +9,13 @@ type CountryCovidCasesDay =
       Date: DateTime
       Confirmed: int option
       Deaths: int option
+
       Recovered: int option }
+
+type CountryCovidCasesSummary =
+    { Country: string
+      Confirmed: int
+      Deaths: int
+      Recovered: int }
 
 type AllCases = CountryCovidCasesDay seq

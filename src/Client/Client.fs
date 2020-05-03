@@ -15,12 +15,12 @@ open Shared
 // in this case, we are keeping track of a counter
 // we mark it as optional, because initially it will not be available from the client
 // the initial value will be requested from server
-type Model = { Countries: CountryCovidCasesDay seq option }
+type Model = { Countries: CountryCovidCasesSummary seq option }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | InitialCountriesLoaded of CountryCovidCasesDay seq
+    | InitialCountriesLoaded of CountryCovidCasesSummary seq
 
 module Server =
 
@@ -32,7 +32,7 @@ module Server =
       Remoting.createApi()
       |> Remoting.withRouteBuilder Route.builder
       |> Remoting.buildProxy<ICovidDataApi>
-let initialCounter = Server.api.init
+let initialCounter = Server.api.summary
 
 // defines the initial state
 let init () : Model =
@@ -84,15 +84,15 @@ let safeComponents =
           str " powered by: "
           components ]
 
-let tableRow (model: CountryCovidCasesDay) =
+let tableRow (model: CountryCovidCasesSummary) =
     tr [ ]
        [ th [ ] [ str model.Country ]
-         th [ ] [ str ((model.Confirmed |> Option.defaultValue 0).ToString()) ]
-         th [ ] [ str (model.Date.Date.ToString()) ] ]
+         th [ ] [ str (model.Confirmed.ToString()) ]
+         th [ ] [ str (model.Deaths.ToString()) ] ]
 
 let show = function
     | { Countries = Some countries } ->
-        countries |> Seq.sortBy(fun x -> x.Date) |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
+        countries |> Seq.sortByDescending(fun x -> x.Confirmed) |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
     | { Countries = None   } ->
         [ tr [][]]
 
@@ -118,7 +118,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                   [ tr [ ]
                        [ th [ ] [ str "Country" ]
                          th [ ] [ str "Cases" ]
-                         th [ ] [ str "Birthday" ] ] ]
+                         th [ ] [ str "Deaths" ] ] ]
                 tbody [ ] (show model) ]
           Footer.footer [ ]
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]

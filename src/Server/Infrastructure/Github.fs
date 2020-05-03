@@ -15,7 +15,7 @@ module Github =
           Deaths: int option
           Recovered: int option }
 
-    let private firstReportDate = DateTime(2020, 1, 22).AddDays(0.)
+    let private firstReportDate = DateTime(2020, 1, 22)
     let private lastReportDate = DateTime.Today
 
     let private dateCount = (lastReportDate - firstReportDate).Days
@@ -59,6 +59,7 @@ module Github =
 
 
     let loadData() : AsyncSeq<CountryCovidCasesDay> =
+        printfn "lastReportDate %A" lastReportDate
         dailyReportUrls
         |> AsyncSeq.ofSeq
         |> AsyncSeq.mapAsyncParallel (loadCsv)

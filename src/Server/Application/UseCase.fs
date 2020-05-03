@@ -5,6 +5,12 @@ module UseCase =
     open Domain
 
 
+    let private mapToSummaryDto (domainCovid: Domain.Types.CountryCovidCasesSummary): Shared.CountryCovidCasesSummary =
+        { Country = domainCovid.Country
+          Confirmed = domainCovid.Confirmed
+          Deaths = domainCovid.Deaths
+          Recovered = domainCovid.Recovered }
+
     let private mapToDto (domainCovid: Domain.Types.CountryCovidCasesDay): Shared.CountryCovidCasesDay =
         { Country = domainCovid.Country
           Province = domainCovid.Province
@@ -13,10 +19,10 @@ module UseCase =
           Deaths = domainCovid.Deaths
           Recovered = domainCovid.Recovered }
 
-    let getCovidData (getCovidCases: GetCovidCases) () =
+    let getCovidDataSummary (getCovidCases: GetCovidDataSummary) () =
         async {
             let! cases = getCovidCases()
-            return cases |> Seq.map (mapToDto) }
+            return cases |> Seq.map (mapToSummaryDto) }
 
     let getCovidDataByCountry (getCovidCases: GetCovidCasesByCountry) (country: string) =
         async {

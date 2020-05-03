@@ -34,6 +34,24 @@ module Storage =
                 return res |> Array.toSeq
         }
 
+    let summary(): Async<CountryCovidCasesSummary seq> =
+        let mapCases(countryName: string, cases: CountryCovidCasesDay seq): CountryCovidCasesSummary =
+            let lastDay = cases |> Seq.sortByDescending(fun x -> x.Date) |> Seq.tryHead
+            if countryName = "Poland" then printfn "%A" lastDay
+            let struct (confirmed, deaths, recovered) =
+                match lastDay with
+                | Some(last) ->
+                    struct (last.Confirmed |> Option.defaultValue 0, last.Deaths |> Option.defaultValue 0, last.Recovered |> Option.defaultValue 0)
+                | None -> struct (0, 0, 0)
+            { Country = countryName; Confirmed = confirmed; Deaths = deaths; Recovered = recovered}
+
+        async {
+            let! data = getCovidCases()
+            return data
+                    |> Seq.groupBy(fun x -> x.Country)
+                    |> Seq.map(mapCases)
+        }
+
     let findByCountry(coutntry: string): Async<AllCases> =
         async {
             let! data = getCovidCases()
