@@ -1,4 +1,4 @@
-namespace Domain
+namespace Application
 open Domain.Types
 
 type CovidCases = AllCases seq

@@ -2,6 +2,7 @@ namespace Application
 
 module UseCase =
     open Shared
+    open Application
     open Domain
 
 

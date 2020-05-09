@@ -6,13 +6,16 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="paket.references" />
+        <Compile Include="..\Shared\Shared.fs" />
         <Compile Include=".\Domain\Types.fs" />
-        <Compile Include=".\Domain\Storage.fs" />
+
+        <Compile Include=".\Application\Storage.fs" />
+        <Compile Include=".\Application\UseCase.fs" />
 
         <Compile Include=".\Infrastructure\Github.fs" />
         <Compile Include=".\Infrastructure\Storage.fs" />
-        <Compile Include="..\Shared\Shared.fs" />
-        <Compile Include=".\Application\UseCase.fs" />
+
+
         <Compile Include="Server.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
