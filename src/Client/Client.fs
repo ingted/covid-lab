@@ -12,8 +12,10 @@ open Thoth.Json
 open Shared
 
 type Page =
-    | Countries
+    | CountriesList
     | Country of string
+
+type State = { Countries: CountryCovidCasesSummary seq option }
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
