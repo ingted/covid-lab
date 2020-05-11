@@ -8,25 +8,18 @@ open Fable.React
 open Fable.React.Props
 open Fulma
 open Thoth.Json
-
 open Shared
 
 type Page =
     | CountriesList
     | Country of string
 
-type State = { Countries: CountryCovidCasesSummary seq option }
-
-// The model holds data that you want to keep track of while the application is running
-// in this case, we are keeping track of a counter
-// we mark it as optional, because initially it will not be available from the client
-// the initial value will be requested from server
-type Model = { Countries: CountryCovidCasesSummary seq option }
+type State = { Countries: Countries.State; CurrentPage: Page }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | InitialCountriesLoaded of CountryCovidCasesSummary seq
+    | CountriesMsg of Countries.Msg
 
 module Server =
 
@@ -38,30 +31,20 @@ module Server =
       Remoting.createApi()
       |> Remoting.withRouteBuilder Route.builder
       |> Remoting.buildProxy<ICovidDataApi>
+
 let initialCounter = Server.api.summary
 
 // defines the initial state
-let init () : Model =
-    { Countries = None }
+let init () : State =
+    { Countries = Countries.init(); CurrentPage = CountriesList }
 // The update function computes the next state of the application based on the current state and the incoming events/messages
-let update (msg : Msg) (currentModel : Model) : Model =
-    match currentModel.Countries, msg with
-    | _, InitialCountriesLoaded countries ->
-        { Countries = Some(countries) }
-    | _ -> currentModel
+let update (msg : Msg) (state : State) : State =
+    match msg with
+    | CountriesMsg msg ->
+        let update = Countries.update(msg)(state.Countries)
+        { state with Countries = update }
+    | _ -> state
 
-
-let load = AsyncRx.ofAsync (initialCounter ())
-
-let loadCount =
-    load
-    |> AsyncRx.map InitialCountriesLoaded
-    |> AsyncRx.toStream "loading"
-
-let stream model msgs =
-    match model.Countries with
-    | None -> loadCount
-    | _ -> msgs
 
 let safeComponents =
     let components =
@@ -109,7 +92,7 @@ let button txt onClick =
           Button.OnClick onClick ]
         [ str txt ]
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view (model : State) (dispatch : Msg -> unit) =
     div []
         [ Navbar.navbar [ Navbar.Color IsPrimary ]
             [ Navbar.Item.div [ ]
