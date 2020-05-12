@@ -32,7 +32,7 @@ module Server =
       |> Remoting.withRouteBuilder Route.builder
       |> Remoting.buildProxy<ICovidDataApi>
 
-let initialCounter = Server.api.summary
+let apiSummary = Server.api.summary
 
 // defines the initial state
 let init () : State =
@@ -45,6 +45,11 @@ let update (msg : Msg) (state : State) : State =
         { state with Countries = update }
     | _ -> state
 
+
+let stream (api : ICovidDataApi) (model: State) msgs =
+    match model with
+    | { CurrentPage = CountriesList; } -> Countries.stream (api) (model.Countries)
+    | _ -> msgs
 
 let safeComponents =
     let components =
@@ -73,18 +78,6 @@ let safeComponents =
           str " powered by: "
           components ]
 
-let tableRow (model: CountryCovidCasesSummary) =
-    tr [ ]
-       [ th [ ] [ str model.Country ]
-         th [ ] [ str (model.Confirmed.ToString()) ]
-         th [ ] [ str (model.Deaths.ToString()) ] ]
-
-let show = function
-    | { Countries = Some countries } ->
-        countries |> Seq.sortByDescending(fun x -> x.Confirmed) |> Seq.map(fun c -> c |> tableRow ) |> Seq.toList
-    | { Countries = None   } ->
-        [ tr [][]]
-
 let button txt onClick =
     Button.button
         [ Button.IsFullWidth
@@ -100,18 +93,11 @@ let view (model : State) (dispatch : Msg -> unit) =
                     [ str "SAFE Template" ] ] ]
 
 
-          Table.table [ Table.IsBordered
-                        Table.IsFullWidth
-                        Table.IsStriped ]
-              [ thead [ ]
-                  [ tr [ ]
-                       [ th [ ] [ str "Country" ]
-                         th [ ] [ str "Cases" ]
-                         th [ ] [ str "Deaths" ] ] ]
-                tbody [ ] (show model) ]
+          Countries.view (model.Countries)()
           Footer.footer [ ]
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
                     [ safeComponents ] ] ]
+
 
 #if DEBUG
 open Elmish.Debug
